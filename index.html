@@ -1,0 +1,1354 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sakura Clinic 🌸</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&family=Playfair+Display:ital@1&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script>
+firebase.initializeApp({
+  apiKey:"AIzaSyBHy4110KksAA4p661eLs3vDsPcr_88b-M",
+  authDomain:"sakura-clinic-f8978.firebaseapp.com",
+  projectId:"sakura-clinic-f8978",
+  storageBucket:"sakura-clinic-f8978.firebasestorage.app",
+  messagingSenderId:"570440420922",
+  appId:"1:570440420922:web:044c2d1ebb32930a86af03"
+});
+const db = firebase.firestore();
+</script>
+<style>
+:root{
+  --p50:#fff0f5;--p100:#ffe0ec;--p200:#ffb8d2;--p300:#ff85b3;
+  --p400:#f7548f;--p500:#e8336e;--p600:#c91a56;--p700:#a01242;
+  --blush:#fce4ec;--cream:#fff9fb;--dark:#2d1b2e;--mid:#6b3a5a;--light:#b07090;
+  --shadow:0 4px 30px rgba(232,51,110,.12);--r:20px;--rs:12px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Tajawal',sans-serif;background:var(--cream);color:var(--dark);min-height:100vh;overflow-x:hidden}
+.petals{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+.petal{position:absolute;border-radius:50% 50% 50% 0;animation:fall linear infinite}
+@keyframes fall{0%{transform:translateY(-60px) rotate(0deg);opacity:.6}100%{transform:translateY(110vh) rotate(360deg);opacity:0}}
+.view{display:none;min-height:100vh;position:relative;z-index:1;padding-bottom:80px}
+.view.active{display:block}
+#landing,#admin-login{padding-bottom:0}
+#adminBtn{display:none!important}
+#admin-login.view:not(.active){display:none!important}
+.toast{position:fixed;bottom:100px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--dark);color:#fff;padding:12px 24px;border-radius:50px;font-size:14px;font-weight:600;opacity:0;transition:all .3s;z-index:999;white-space:nowrap;pointer-events:none}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:400;align-items:center;justify-content:center;padding:20px}
+.overlay.open{display:flex}
+.modal{background:#fff;border-radius:var(--r);padding:26px 22px;width:100%;max-width:420px;max-height:90vh;overflow-y:auto;box-shadow:0 20px 80px rgba(0,0,0,.3)}
+.modal h3{font-size:18px;font-weight:800;color:var(--p600);margin-bottom:18px}
+.modal-btns{display:flex;gap:10px;margin-top:18px}
+.btn-p{padding:13px 18px;border:none;border-radius:var(--rs);background:linear-gradient(135deg,var(--p400),var(--p600));color:#fff;font-size:14px;font-weight:700;cursor:pointer;font-family:'Tajawal',sans-serif;transition:all .2s;width:100%}
+.btn-p:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(232,51,110,.35)}
+.btn-s{padding:13px 18px;border:2px solid var(--p200);background:#fff;border-radius:var(--rs);color:var(--p500);font-size:14px;font-weight:700;cursor:pointer;font-family:'Tajawal',sans-serif;transition:all .2s;width:100%}
+.btn-s:hover{background:var(--p50)}
+input[type=text],input[type=tel],input[type=password],input[type=datetime-local],textarea,select{width:100%;padding:12px 15px;border:2px solid var(--p200);border-radius:var(--rs);font-family:'Tajawal',sans-serif;font-size:14px;color:var(--dark);background:var(--p50);outline:none;transition:border-color .2s,box-shadow .2s}
+input:focus,textarea:focus,select:focus{border-color:var(--p400);box-shadow:0 0 0 3px rgba(247,84,143,.1);background:#fff}
+textarea{resize:vertical;min-height:76px}
+label{font-size:14px;font-weight:600;color:var(--dark);display:block;margin-bottom:7px}
+.field{margin-bottom:14px}
+.card{background:#fff;border-radius:var(--r);padding:20px 18px;margin-bottom:14px;box-shadow:var(--shadow);border:1px solid rgba(255,182,213,.3)}
+.card-title{font-size:15px;font-weight:700;color:var(--p600);margin-bottom:12px;display:flex;align-items:center;gap:7px}
+.radio-group{display:flex;flex-direction:column;gap:9px}
+.radio-opt{display:flex;align-items:flex-start;gap:11px;background:var(--p50);border-radius:var(--rs);padding:13px 15px;cursor:pointer;border:2px solid transparent;transition:all .2s}
+.radio-opt:hover{border-color:var(--p200)}
+.radio-opt.selected{border-color:var(--p400);background:#fff}
+.radio-opt input{display:none}
+.rc{width:20px;height:20px;min-width:20px;border:2px solid #d0a0b8;border-radius:50%;margin-top:2px;display:flex;align-items:center;justify-content:center;transition:all .2s}
+.radio-opt.selected .rc{border-color:var(--p500);background:var(--p500)}
+.radio-opt.selected .rc::after{content:'';width:8px;height:8px;background:#fff;border-radius:50%}
+.rt{font-size:14px;font-weight:500;color:var(--dark);line-height:1.5}
+.rp{font-size:13px;color:var(--p600);font-weight:700;margin-top:2px}
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;background:#fff;padding:8px 8px 16px;display:flex;justify-content:space-around;box-shadow:0 -4px 30px rgba(136,14,79,.1);z-index:100;border-top:1px solid var(--blush)}
+.ni{display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;flex:1;background:none;border:none;font-family:'Tajawal',sans-serif;padding:5px 2px;border-radius:10px;transition:background .2s}
+.ni:hover{background:var(--p50)}
+.ni-icon{font-size:21px}
+.ni-lbl{font-size:10px;font-weight:600;color:var(--light)}
+.ni.active .ni-lbl{color:var(--p500)}
+.ni.active{background:var(--p50)}
+.page-hdr{background:linear-gradient(135deg,var(--p500),var(--p700));padding:50px 22px 26px;text-align:center;color:#fff;position:relative;overflow:hidden}
+.page-hdr::before{content:'🌸';font-size:120px;opacity:.07;position:absolute;right:-15px;top:-15px;line-height:1}
+.page-hdr h2{font-size:23px;font-weight:800;margin-bottom:5px}
+.page-hdr p{font-size:13px;opacity:.85}
+.badge{padding:4px 11px;border-radius:50px;font-size:11px;font-weight:700;display:inline-block}
+.admin-badge{position:absolute;top:-6px;right:-6px;background:#e53935;color:#fff;border-radius:50%;width:20px;height:20px;font-size:11px;font-weight:800;display:none;align-items:center;justify-content:center;}
+.b-new{background:#e8f5e9;color:#2e7d32}
+.b-pending{background:#fff3e0;color:#e65100}
+.b-confirmed{background:#e3f2fd;color:#1565c0}
+.b-scheduled{background:#ede7f6;color:#4527a0}
+.b-done{background:#f3e5f5;color:#6a1b9a}
+.copy-btn{display:inline-flex;align-items:center;gap:5px;font-size:12px;color:var(--p500);cursor:pointer;background:none;border:none;font-family:'Tajawal',sans-serif;padding:3px 0;font-weight:600}
+.acct-num{font-size:14px;font-weight:700;direction:ltr;text-align:right;margin-top:3px;word-break:break-all}
+.warn-box{background:linear-gradient(135deg,#fff3e0,#ffe0b2);border-right:4px solid #ff9800;border-radius:var(--rs);padding:15px 17px;margin-bottom:14px;font-size:13px;line-height:1.8;color:#5d3a00}
+.warn-box strong{display:block;margin-bottom:5px;font-size:14px}
+.empty{text-align:center;padding:40px 20px;color:var(--light)}
+.empty .ei{font-size:42px;margin-bottom:10px}
+
+/* ══ LANDING ══ */
+#landing{background:linear-gradient(160deg,#fff0f5 0%,#fce4ec 50%,#fff0f5 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;text-align:center;padding:40px 20px}
+.logo-wrap{width:108px;height:108px;background:linear-gradient(135deg,var(--p300),var(--p500));border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:50px;box-shadow:0 8px 40px rgba(232,51,110,.35);margin-bottom:20px;animation:pulse 3s ease-in-out infinite}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}
+.clinic-name{font-size:38px;font-weight:900;background:linear-gradient(135deg,var(--p600),var(--p400));-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:3px}
+.clinic-en{font-family:'Playfair Display',serif;font-style:italic;font-size:15px;color:var(--light);margin-bottom:7px}
+.doctor-tag{font-size:13px;color:var(--mid);background:rgba(255,255,255,.8);padding:7px 20px;border-radius:50px;margin-bottom:32px;border:1px solid var(--blush)}
+.landing-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;max-width:370px;width:100%}
+.land-btn{background:#fff;border:none;border-radius:var(--r);padding:24px 14px;cursor:pointer;box-shadow:0 6px 28px rgba(136,14,79,.1);transition:all .3s;display:flex;flex-direction:column;align-items:center;gap:7px;font-family:'Tajawal',sans-serif}
+.land-btn:hover{transform:translateY(-4px);box-shadow:0 14px 45px rgba(136,14,79,.18)}
+.land-btn.full{grid-column:1/-1;background:linear-gradient(135deg,var(--p400),var(--p600));color:#fff}
+.land-btn.full:hover{background:linear-gradient(135deg,var(--p500),var(--p700))}
+.l-icon{font-size:28px}
+.l-title{font-size:13px;font-weight:700}
+.land-btn:not(.full) .l-title{color:var(--dark)}
+.l-sub{font-size:11px;color:var(--light)}
+.land-btn.full .l-sub{color:rgba(255,255,255,.75)}
+
+/* ══ BOOKING ══ */
+.bk-hdr{background:linear-gradient(135deg,var(--p500),var(--p700));padding:50px 22px 26px;text-align:center;color:#fff}
+.bk-hdr h2{font-size:22px;font-weight:800;margin-bottom:4px}
+.bk-hdr p{font-size:13px;opacity:.85}
+.prog-wrap{padding:16px 18px 0}
+.prog-steps{display:flex;justify-content:space-between;align-items:center;margin-bottom:7px}
+.sdot{width:27px;height:27px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;transition:all .3s;background:#e0c4d0;color:#9a6a80;flex-shrink:0}
+.sdot.done{background:var(--p500);color:#fff}
+.sdot.active{background:var(--p400);color:#fff;box-shadow:0 0 0 4px rgba(247,84,143,.2)}
+.sline{flex:1;height:3px;background:#e0c4d0;margin:0 3px;border-radius:2px}
+.sline.done{background:var(--p400)}
+.prog-label{text-align:center;font-size:12px;color:var(--light);margin-top:3px}
+.fp{display:none;padding:16px 16px 0}
+.fp.active{display:block}
+.nav-btns{display:flex;gap:10px;padding:16px 16px 0}
+.btn-back{flex:1;padding:13px;border-radius:var(--rs);border:2px solid var(--p200);background:#fff;color:var(--p500);font-size:13px;font-weight:700;cursor:pointer;font-family:'Tajawal',sans-serif}
+.btn-nxt{flex:2;padding:13px;border-radius:var(--rs);border:none;background:linear-gradient(135deg,var(--p400),var(--p600));color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:'Tajawal',sans-serif;box-shadow:0 4px 18px rgba(232,51,110,.3)}
+
+/* success */
+.success-wrap{text-align:center;padding:46px 22px;display:flex;flex-direction:column;align-items:center;gap:14px}
+.success-icon{font-size:78px;animation:pop .6s ease}
+@keyframes pop{0%{transform:scale(0)}70%{transform:scale(1.15)}100%{transform:scale(1)}}
+.success-wrap h2{font-size:24px;font-weight:800;color:var(--p600)}
+.success-wrap p{color:var(--mid);font-size:13px;line-height:1.7}
+.track-box{background:#fff;border-radius:var(--r);padding:18px;box-shadow:var(--shadow);border:1px solid var(--blush);width:100%;text-align:right}
+.track-box h4{font-size:14px;font-weight:700;color:var(--p600);margin-bottom:8px}
+.track-id-num{font-size:20px;font-weight:900;color:var(--p500);letter-spacing:2px}
+
+/* ══ TRACKING ══ */
+.timeline-item{display:flex;gap:13px;margin-bottom:18px}
+.t-dot{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;background:var(--p50);border:2px solid var(--p200)}
+.t-dot.done{background:var(--p500);border-color:var(--p500)}
+.t-title{font-size:14px;font-weight:700;color:var(--dark)}
+.t-sub{font-size:12px;color:var(--light);margin-top:2px}
+
+/* ══ MESSAGES ══ */
+.chat-wrap{display:flex;flex-direction:column;height:calc(100vh - 240px)}
+.chat-area{flex:1;overflow-y:auto;padding:14px 16px;display:flex;flex-direction:column;gap:9px;background:var(--p50)}
+.bubble{max-width:82%;padding:11px 15px;border-radius:18px;font-size:13.5px;line-height:1.6}
+.bubble.patient{background:#fff;border:1px solid var(--blush);border-bottom-right-radius:4px;align-self:flex-end}
+.bubble.doctor{background:linear-gradient(135deg,var(--p400),var(--p600));color:#fff;border-bottom-left-radius:4px;align-self:flex-start}
+.btime{font-size:10px;opacity:.6;margin-top:3px;display:block}
+.bimg{max-width:190px;border-radius:10px;margin-top:5px;display:block}
+.chat-input{padding:10px 14px;background:#fff;border-top:1px solid var(--blush);display:flex;gap:9px;align-items:flex-end}
+.chat-input textarea{flex:1;min-height:42px;max-height:110px;padding:10px 13px;border-radius:20px;font-size:13px;resize:none}
+.send-btn{width:42px;height:42px;border-radius:50%;border:none;background:linear-gradient(135deg,var(--p400),var(--p600));color:#fff;font-size:19px;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center}
+.attach-btn{width:42px;height:42px;border-radius:50%;border:2px solid var(--p200);background:#fff;color:var(--p500);font-size:19px;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center}
+
+/* ══ SERVICES ══ */
+.svc-card{background:#fff;border-radius:var(--r);padding:18px;box-shadow:var(--shadow);border:1px solid rgba(255,182,213,.3);display:flex;justify-content:space-between;align-items:center;gap:10px}
+.svc-name{font-size:14px;font-weight:700;margin-bottom:3px}
+.svc-desc{font-size:12px;color:var(--light)}
+.svc-price{background:linear-gradient(135deg,var(--p400),var(--p600));color:#fff;border-radius:50px;padding:7px 14px;font-size:13px;font-weight:800;white-space:nowrap}
+
+/* ══ ADMIN LOGIN ══ */
+#admin-login{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;background:linear-gradient(160deg,#1a0510,#3d0d2b);padding:30px 22px}
+.adm-logo{font-size:48px;margin-bottom:13px}
+.adm-title{color:#fff;font-size:24px;font-weight:800;margin-bottom:3px}
+.adm-sub{color:rgba(255,255,255,.5);font-size:13px;margin-bottom:34px}
+.adm-form{width:100%;max-width:330px;display:flex;flex-direction:column;gap:13px}
+.adm-input{padding:13px 17px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.15);border-radius:var(--rs);color:#fff;font-family:'Tajawal',sans-serif;font-size:15px;outline:none;transition:all .2s}
+.adm-input::placeholder{color:rgba(255,255,255,.35)}
+.adm-input:focus{border-color:var(--p400);background:rgba(255,255,255,.1)}
+.adm-err{color:#ff8a9a;font-size:13px;text-align:center;display:none}
+
+/* ══ ADMIN PANEL ══ */
+#admin-panel{background:#f5f0f5;min-height:100vh}
+.adm-hdr{background:linear-gradient(135deg,#1a0510,#3d0d2b);padding:50px 18px 16px;color:#fff;display:flex;justify-content:space-between;align-items:center}
+.adm-hdr h2{font-size:18px;font-weight:800}
+.adm-hdr p{font-size:11px;opacity:.55;margin-top:2px}
+.btn-logout{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:#fff;padding:7px 14px;border-radius:50px;font-size:12px;cursor:pointer;font-family:'Tajawal',sans-serif}
+.adm-tabs{display:flex;background:#fff;border-bottom:2px solid var(--blush);overflow-x:auto}
+.adm-tab{flex:1;padding:12px 5px;border:none;background:none;font-family:'Tajawal',sans-serif;font-size:11px;font-weight:700;color:var(--light);cursor:pointer;white-space:nowrap;border-bottom:3px solid transparent;margin-bottom:-2px;transition:all .2s;min-width:60px}
+.adm-tab.active{color:var(--p500);border-bottom-color:var(--p500)}
+.adm-content{padding:16px}
+.adm-sec{display:none}
+.adm-sec.active{display:block}
+.bk-card{background:#fff;border-radius:var(--r);padding:16px;margin-bottom:11px;box-shadow:var(--shadow);border-right:4px solid var(--p400)}
+.bk-name{font-size:15px;font-weight:700}
+.bk-svc{font-size:13px;color:var(--p500);font-weight:600;margin-bottom:2px}
+.bk-date{font-size:12px;color:var(--light)}
+.bk-meta{font-size:12px;color:var(--mid);margin-top:4px}
+.bk-acts{display:flex;gap:7px;margin-top:10px;flex-wrap:wrap}
+.bk-btn{padding:6px 12px;border-radius:50px;border:none;font-size:11px;font-weight:700;cursor:pointer;font-family:'Tajawal',sans-serif}
+.bb-msg{background:var(--p50);color:var(--p600)}
+.bb-st{background:#e3f2fd;color:#1565c0}
+.bb-meet{background:#e8f5e9;color:#2e7d32}
+.bb-del{background:#ffeef0;color:#c62828}
+.svc-adm{background:#fff;border-radius:var(--rs);padding:14px 16px;box-shadow:var(--shadow);display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:9px}
+.sa-name{font-size:14px;font-weight:700;margin-bottom:2px}
+.sa-price{font-size:12px;color:var(--p500);font-weight:600}
+.sa-acts{display:flex;gap:7px}
+.btn-edit,.btn-del{width:32px;height:32px;border-radius:50%;border:none;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center}
+.btn-edit{background:var(--p50)}
+.btn-del{background:#ffeef0}
+.add-svc{background:#fff;border-radius:var(--r);padding:18px;box-shadow:var(--shadow);margin-bottom:14px}
+.add-svc h4{font-size:14px;font-weight:700;color:var(--p600);margin-bottom:12px}
+.adm-field{margin-bottom:11px}
+.adm-field label{font-size:12px;font-weight:600;color:var(--mid);margin-bottom:5px;display:block}
+.adm-field input,.adm-field textarea,.adm-field select{padding:10px 13px;border:2px solid var(--p200);border-radius:var(--rs);background:var(--p50);font-family:'Tajawal',sans-serif;font-size:13px;width:100%;outline:none;transition:all .2s}
+.adm-field input:focus,.adm-field textarea:focus{border-color:var(--p400);background:#fff}
+.stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:11px;margin-bottom:14px}
+.stat-card{background:#fff;border-radius:var(--r);padding:18px;text-align:center;box-shadow:var(--shadow)}
+.stat-num{font-size:32px;font-weight:900;color:var(--p500)}
+.stat-lbl{font-size:11px;color:var(--light);margin-top:3px}
+.settings-sec{background:#fff;border-radius:var(--r);padding:18px;box-shadow:var(--shadow);margin-bottom:12px}
+.settings-sec h4{font-size:14px;font-weight:700;color:var(--p600);margin-bottom:12px}
+.admin-user-card{background:var(--p50);border-radius:var(--rs);padding:14px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;border:1px solid var(--blush)}
+.au-info .au-name{font-size:14px;font-weight:700}
+.au-info .au-role{font-size:12px;color:var(--light)}
+.star{font-size:28px;cursor:pointer;filter:grayscale(1);opacity:.4;transition:all .2s}
+.star.active{filter:none;opacity:1;transform:scale(1.1)}
+.star-row{display:flex;gap:5px;margin:8px 0}
+</style>
+</head>
+<body>
+<div class="petals" id="petalsBg"></div>
+<div class="toast" id="toast"></div>
+
+<!-- MODAL: Edit Service -->
+<div class="overlay" id="editModal">
+  <div class="modal">
+    <h3>✏️ تعديل الخدمة</h3>
+    <div class="adm-field"><label>اسم الخدمة</label><input type="text" id="eN"></div>
+    <div class="adm-field"><label>السعر (دينار)</label><input type="text" id="eP"></div>
+    <div class="adm-field"><label>الوصف</label><textarea id="eD" rows="2"></textarea></div>
+    <div class="modal-btns">
+      <button class="btn-s" style="flex:1" onclick="closeModal('editModal')">إلغاء</button>
+      <button class="btn-p" style="flex:2" onclick="saveEdit()">💾 حفظ</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Status -->
+<div class="overlay" id="statusModal">
+  <div class="modal">
+    <h3>📊 تحديث حالة الطلب</h3>
+    <div class="adm-field"><label>الحالة الجديدة</label>
+      <select id="newStatus">
+        <option value="new">🆕 جديد</option>
+        <option value="pending">⏳ قيد المراجعة</option>
+        <option value="confirmed">✅ تم التأكيد</option>
+        <option value="scheduled">📅 تم تحديد الموعد</option>
+        <option value="done">✔️ مكتمل</option>
+      </select>
+    </div>
+    <div class="adm-field"><label>ملاحظة للمريض (اختياري)</label><textarea id="statusNote" rows="2" placeholder="مثال: موعدك الثلاثاء الساعة 6 مساءً"></textarea></div>
+    <div class="modal-btns">
+      <button class="btn-s" style="flex:1" onclick="closeModal('statusModal')">إلغاء</button>
+      <button class="btn-p" style="flex:2" onclick="saveStatus()">✅ تحديث</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Rating -->
+<div class="overlay" id="ratingModal">
+  <div class="modal">
+    <h3>⭐ تقييم الخدمة</h3>
+    <p style="font-size:13px;color:var(--mid);margin-bottom:14px">كيف كانت تجربتك مع عيادة ساكورا؟</p>
+    <div class="star-row" id="starRow">
+      <span class="star" onclick="rateStar(1)">⭐</span>
+      <span class="star" onclick="rateStar(2)">⭐</span>
+      <span class="star" onclick="rateStar(3)">⭐</span>
+      <span class="star" onclick="rateStar(4)">⭐</span>
+      <span class="star" onclick="rateStar(5)">⭐</span>
+    </div>
+    <div class="adm-field" style="margin-top:10px"><label>تعليق (اختياري)</label><textarea id="ratComment" rows="2" placeholder="شاركنا رأيك..."></textarea></div>
+    <div class="modal-btns">
+      <button class="btn-s" style="flex:1" onclick="closeModal('ratingModal')">لاحقاً</button>
+      <button class="btn-p" style="flex:2" onclick="submitRating()">إرسال 🌸</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Add Admin -->
+<div class="overlay" id="addAdminModal">
+  <div class="modal">
+    <h3>➕ إضافة أدمن جديد</h3>
+    <div class="adm-field"><label>اسم المستخدم</label><input type="text" id="naU" placeholder="اسم المستخدم"></div>
+    <div class="adm-field"><label>كلمة المرور</label><input type="password" id="naP" placeholder="كلمة المرور"></div>
+    <div class="modal-btns">
+      <button class="btn-s" style="flex:1" onclick="closeModal('addAdminModal')">إلغاء</button>
+      <button class="btn-p" style="flex:2" onclick="addAdminUser()">➕ إضافة</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ LANDING ══════════════ -->
+<div id="landing" class="view active">
+  <div class="logo-wrap" id="mainLogo" onmousedown="startLogoPress()" onmouseup="cancelLogoPress()" onmouseleave="cancelLogoPress()" ontouchstart="startLogoPress()" ontouchend="cancelLogoPress()">🌸</div>
+  <div class="clinic-name">Sakura Clinic</div>
+  <div class="clinic-en">عيادة ساكورا للطب النفسي</div>
+  <div class="doctor-tag">د. أحمد عياد · طب نفسي كبار وصغار وعلاج اضطرابات نفسية</div>
+  <div class="landing-grid">
+    <button class="land-btn full" onclick="startBooking()">
+      <span class="l-icon">📋</span><span class="l-title">احجز استشارة الآن</span><span class="l-sub">نموذج الحجز الإلكتروني</span>
+    </button>
+    <button class="land-btn" onclick="goTracking()">
+      <span class="l-icon">🔍</span><span class="l-title">تتبع طلبي</span><span class="l-sub">حالة الحجز</span>
+    </button>
+    <button class="land-btn" onclick="goMessages()">
+      <span class="l-icon">💬</span><span class="l-title">الرسائل</span><span class="l-sub">تواصل مع الطبيب</span>
+    </button>
+    <button class="land-btn" onclick="goServices()">
+      <span class="l-icon">💊</span><span class="l-title">الخدمات</span><span class="l-sub">الأسعار</span>
+    </button>
+    <button class="land-btn" onclick="showView('admin-login')" style="position:relative;display:none" id="adminBtn">
+      <span class="admin-badge" id="landingBadge"></span>>
+      <span class="l-icon">🔐</span><span class="l-title">لوحة الأدمن</span><span class="l-sub">للطبيب فقط</span>
+    </button>
+  </div>
+</div>
+
+<!-- ══════════════ BOOKING ══════════════ -->
+<div id="booking" class="view">
+  <div class="bk-hdr">
+    <h2>🌸 نموذج الاستشارة النفسية</h2>
+    <p>د. أحمد عياد · طب نفسي كبار وصغار</p>
+  </div>
+  <div class="prog-wrap">
+    <div class="prog-steps">
+      <div class="sdot active" id="d1">١</div><div class="sline" id="l1"></div>
+      <div class="sdot" id="d2">٢</div><div class="sline" id="l2"></div>
+      <div class="sdot" id="d3">٣</div><div class="sline" id="l3"></div>
+      <div class="sdot" id="d4">٤</div><div class="sline" id="l4"></div>
+      <div class="sdot" id="d5">٥</div>
+    </div>
+    <div class="prog-label" id="progLbl">الخطوة ١ من ٥ — البيانات الأساسية</div>
+  </div>
+
+  <!-- ص١: بيانات أساسية -->
+  <div class="fp active" id="bp1">
+    <div class="card">
+      <div class="card-title">👤 بياناتك الأساسية</div>
+      <div class="field"><label>الاسم (يمكن استخدام اسم مستعار) *</label><input type="text" id="f_name" placeholder="اكتب اسمك..."></div>
+      <div class="field"><label>العمر *</label><input type="text" id="f_age" placeholder="مثال: 25"></div>
+      <div class="field"><label>الجنس *</label>
+        <div class="radio-group">
+          <div class="radio-opt" onclick="sel(this,'gender','ذكر')"><input type="radio" name="gender"><div class="rc"></div><div class="rt">ذكر</div></div>
+          <div class="radio-opt" onclick="sel(this,'gender','أنثى')"><input type="radio" name="gender"><div class="rc"></div><div class="rt">أنثى</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="nav-btns">
+      <button class="btn-back" onclick="showView('landing')">← رجوع</button>
+      <button class="btn-nxt" onclick="gp(2)">التالي ←</button>
+    </div>
+  </div>
+
+  <!-- ص٢: استبيان طبي -->
+  <div class="fp" id="bp2">
+    <div class="card">
+      <div class="card-title">🩺 الاستبيان الطبي</div>
+      <div class="field"><label>أبرز الأعراض *</label>
+        <div class="radio-group">
+          <div class="radio-opt" onclick="sel(this,'symptom','قلق وتوتر مستمر')"><input type="radio" name="symptom"><div class="rc"></div><div class="rt">قلق وتوتر مستمر</div></div>
+          <div class="radio-opt" onclick="sel(this,'symptom','اكتئاب وحزن')"><input type="radio" name="symptom"><div class="rc"></div><div class="rt">اكتئاب وحزن</div></div>
+          <div class="radio-opt" onclick="sel(this,'symptom','اضطراب النوم')"><input type="radio" name="symptom"><div class="rc"></div><div class="rt">اضطراب النوم</div></div>
+          <div class="radio-opt" onclick="sel(this,'symptom','صدمة أو ذكريات مؤلمة')"><input type="radio" name="symptom"><div class="rc"></div><div class="rt">صدمة أو ذكريات مؤلمة</div></div>
+          <div class="radio-opt" onclick="sel(this,'symptom','مشاكل سلوكية')"><input type="radio" name="symptom"><div class="rc"></div><div class="rt">مشاكل سلوكية</div></div>
+          <div class="radio-opt" onclick="sel(this,'symptom','أخرى')"><input type="radio" name="symptom"><div class="rc"></div><div class="rt">أخرى</div></div>
+        </div>
+      </div>
+      <div class="field"><label>هل تتناول أدوية حالياً؟</label><input type="text" id="f_meds" placeholder="اذكر الأدوية أو اكتب: لا"></div>
+      <div class="field"><label>هل سبق تشخيصك بحالة نفسية؟</label>
+        <div class="radio-group">
+          <div class="radio-opt" onclick="sel(this,'prev_dx','نعم')"><input type="radio" name="prev_dx"><div class="rc"></div><div class="rt">نعم</div></div>
+          <div class="radio-opt" onclick="sel(this,'prev_dx','لا')"><input type="radio" name="prev_dx"><div class="rc"></div><div class="rt">لا</div></div>
+        </div>
+      </div>
+      <div class="field"><label>هل تلقيت علاجاً نفسياً سابقاً؟</label>
+        <div class="radio-group">
+          <div class="radio-opt" onclick="sel(this,'prev_treat','نعم')"><input type="radio" name="prev_treat"><div class="rc"></div><div class="rt">نعم</div></div>
+          <div class="radio-opt" onclick="sel(this,'prev_treat','لا')"><input type="radio" name="prev_treat"><div class="rc"></div><div class="rt">لا</div></div>
+        </div>
+      </div>
+      <div class="field"><label>وصف مختصر لحالتك</label><textarea id="f_desc" placeholder="اكتب باختصار ما تمر به..."></textarea></div>
+    </div>
+    <div class="nav-btns">
+      <button class="btn-back" onclick="gp(1)">← رجوع</button>
+      <button class="btn-nxt" onclick="gp(3)">التالي ←</button>
+    </div>
+  </div>
+
+  <!-- ص٣: خدمة + وقت + قانوني -->
+  <div class="fp" id="bp3">
+    <div class="warn-box">
+      <strong>⚖️ تنبيه طبي وقانوني</strong>
+      هذه الخدمة للاستشارات غير الطارئة. في حال وجود أفكار لإيذاء النفس أو الغير، توجه فوراً لأقرب مستشفى. بياناتك سرية تماماً.
+      <br><br><strong>استمر في حال الموافقة ✅</strong>
+    </div>
+    <div class="card">
+      <div class="card-title">💊 نوع الخدمة *</div>
+      <div class="radio-group" id="servicesRadio"></div>
+    </div>
+    <div class="card">
+      <div class="card-title">🗓️ الوقت المناسب *</div>
+      <input type="datetime-local" id="f_time">
+    </div>
+    <div class="card">
+      <div class="card-title">💬 ملاحظات إضافية</div>
+      <textarea id="f_notes" placeholder="أي معلومات إضافية..."></textarea>
+    </div>
+    <div class="nav-btns">
+      <button class="btn-back" onclick="gp(2)">← رجوع</button>
+      <button class="btn-nxt" onclick="gp(4)">التالي ←</button>
+    </div>
+  </div>
+
+  <!-- ص٤: الدفع -->
+  <div class="fp" id="bp4">
+    <div class="card">
+      <div class="card-title">💳 طريقة الدفع *</div>
+      <p style="font-size:12px;color:var(--light);margin-bottom:12px">سيتم إرسال الميعاد بعد التحقق من الدفع.</p>
+      <div class="radio-group">
+        <div class="radio-opt" onclick="sel(this,'pay','تحويل بنكي')">
+          <input type="radio" name="pay"><div class="rc"></div>
+          <div><div class="rt">تحويل بنكي — المصرف شمال أفريقيا</div>
+          <div class="acct-num">014011206065015</div>
+          <button class="copy-btn" onclick="cp('014011206065015',event)">📋 نسخ</button></div>
+        </div>
+        <div class="radio-opt" onclick="sel(this,'pay','رصيد هاتفي 0942651559')">
+          <input type="radio" name="pay"><div class="rc"></div>
+          <div><div class="rt">رصيد هاتفي</div>
+          <div class="acct-num">0942651559</div>
+          <button class="copy-btn" onclick="cp('0942651559',event)">📋 نسخ</button></div>
+        </div>
+        <div class="radio-opt" onclick="sel(this,'pay','رصيد هاتفي 0913548830')">
+          <input type="radio" name="pay"><div class="rc"></div>
+          <div><div class="rt">رصيد هاتفي</div>
+          <div class="acct-num">0913548830</div>
+          <button class="copy-btn" onclick="cp('0913548830',event)">📋 نسخ</button></div>
+        </div>
+        <div class="radio-opt" onclick="sel(this,'pay','G-Pay')">
+          <input type="radio" name="pay"><div class="rc"></div>
+          <div><div class="rt">G-Pay</div>
+          <div class="acct-num" style="font-size:11px">c6afe347-6db4-4927-be52-e848d8c223ff</div>
+          <button class="copy-btn" onclick="cp('c6afe347-6db4-4927-be52-e848d8c223ff',event)">📋 نسخ</button></div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">📄 إثبات الدفع</div>
+      <input type="text" id="f_proof" placeholder="رقم الإيصال أو ملاحظة الدفع">
+      <p style="font-size:11px;color:var(--light);margin-top:7px">أرسل صورة إثبات الدفع على واتس: <strong>0942651559</strong></p>
+    </div>
+    <div class="nav-btns">
+      <button class="btn-back" onclick="gp(3)">← رجوع</button>
+      <button class="btn-nxt" onclick="gp(5)">التالي ←</button>
+    </div>
+  </div>
+
+  <!-- ص٥: التواصل -->
+  <div class="fp" id="bp5">
+    <div class="card">
+      <div class="card-title">📞 طريقة التواصل *</div>
+      <div class="radio-group">
+        <div class="radio-opt" onclick="sel(this,'contact','واتس')"><input type="radio" name="contact"><div class="rc"></div><div class="rt">رقم واتس</div></div>
+        <div class="radio-opt" onclick="sel(this,'contact','Google Meet')"><input type="radio" name="contact"><div class="rc"></div><div class="rt">رابط Google Meet</div></div>
+        <div class="radio-opt" onclick="sel(this,'contact','رسائل واتس')"><input type="radio" name="contact"><div class="rc"></div><div class="rt">رسائل واتس فقط</div></div>
+        <div class="radio-opt" onclick="sel(this,'contact','رسائل داخل التطبيق')"><input type="radio" name="contact"><div class="rc"></div>
+          <div><div class="rt">💬 رسائل داخل التطبيق</div><div style="font-size:11px;color:var(--p500);margin-top:2px">مراسلة مباشرة مع الطبيب</div></div>
+        </div>
+      </div>
+      <div class="field" style="margin-top:13px">
+        <label>رقم الواتس أو معلومات التواصل *</label>
+        <input type="tel" id="f_phone" placeholder="09XXXXXXXX">
+      </div>
+    </div>
+    <div class="card" style="background:linear-gradient(135deg,#fff0f5,#fce4ec)">
+      <div class="card-title">🏥 للحضور المباشر</div>
+      <p style="font-size:13px;line-height:1.9">مصحة السراج الكبري<br>📅 يوم الثلاثاء — الفترة المسائية<br>📍 طرابلس / السراج / بالقرب من حرف T<br>📞 <a href="tel:0919220101" style="color:var(--p500);font-weight:700">0919220101</a></p>
+      <a href="https://goo.gl/maps/RcJqv6LZHKm6HyoUA" target="_blank" style="display:inline-block;margin-top:9px;padding:8px 16px;background:var(--p500);color:#fff;border-radius:50px;font-size:12px;font-weight:700;text-decoration:none">🗺️ الموقع</a>
+    </div>
+    <div class="nav-btns">
+      <button class="btn-back" onclick="gp(4)">← رجوع</button>
+      <button class="btn-nxt" onclick="submitBooking()">✅ إرسال الحجز</button>
+    </div>
+  </div>
+
+  <!-- نجاح -->
+  <div class="fp" id="bpOk">
+    <div class="success-wrap">
+      <div class="success-icon">🌸</div>
+      <h2>تم الحجز بنجاح!</h2>
+      <p>سيتم التواصل معك بعد التحقق من الدفع وتحديد الموعد.</p>
+      <div class="track-box">
+        <h4>🔑 رقم تتبع طلبك</h4>
+        <div class="track-id-num" id="trackIdShow">—</div>
+        <p style="font-size:11px;color:var(--light);margin-top:6px">احفظ هذا الرقم لمتابعة حجزك ومراسلة الطبيب</p>
+        <button class="copy-btn" style="margin-top:6px" onclick="cp(document.getElementById('trackIdShow').textContent,event)">📋 نسخ الرقم</button>
+      </div>
+      <button class="btn-p" onclick="openRating()">⭐ قيّم تجربتك</button>
+      <button class="btn-p" onclick="goMessages()">💬 فتح الرسائل</button>
+      <button class="btn-s" onclick="resetBooking()">حجز آخر 🌸</button>
+      <button class="btn-s" onclick="showView('landing')">الرئيسية</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ TRACKING ══════════════ -->
+<div id="tracking" class="view">
+  <div class="page-hdr"><h2>🔍 تتبع طلبي</h2><p>أدخل رقم التتبع لمعرفة حالة حجزك</p></div>
+  <div style="padding:18px">
+    <div class="field"><label>رقم التتبع</label><input type="text" id="trackInput" placeholder="SC-XXXXXXXX" style="text-transform:uppercase"></div>
+    <button class="btn-p" onclick="searchBooking()">🔍 بحث</button>
+  </div>
+  <div id="trackResult" style="padding:0 16px"></div>
+  <div class="bottom-nav">
+    <button class="ni" onclick="showView('landing')"><span class="ni-icon">🏠</span><span class="ni-lbl">الرئيسية</span></button>
+    <button class="ni" onclick="startBooking()"><span class="ni-icon">📋</span><span class="ni-lbl">حجز</span></button>
+    <button class="ni active"><span class="ni-icon">🔍</span><span class="ni-lbl">تتبع</span></button>
+    <button class="ni" onclick="showView('messages-view')"><span class="ni-icon">💬</span><span class="ni-lbl">رسائل</span></button>
+  </div>
+</div>
+
+<!-- ══════════════ MESSAGES ══════════════ -->
+<div id="messages-view" class="view" style="padding-bottom:0">
+  <div class="page-hdr" style="padding:50px 22px 18px"><h2>💬 الرسائل</h2><p>تواصل مباشر مع عيادة ساكورا</p></div>
+  <div id="msgEntry" style="padding:16px 16px 0">
+    <div class="field"><label>رقم التتبع الخاص بك</label><input type="text" id="msgTrackInput" placeholder="SC-XXXXXXXX" style="text-transform:uppercase"></div>
+    <button class="btn-p" onclick="openPatientChat()">فتح المحادثة 💬</button>
+    <div class="card" style="margin-top:14px;background:linear-gradient(135deg,var(--p50),var(--blush))">
+      <div class="card-title">📋 كيف يعمل نظام الرسائل؟</div>
+      <p style="font-size:13px;color:var(--mid);line-height:1.8">١. احجز استشارتك أولاً<br>٢. احفظ رقم التتبع<br>٣. أدخله هنا لفتح المحادثة مع الطبيب<br>٤. يمكنك إرسال رسائل وصور وملفات</p>
+    </div>
+  </div>
+  <div id="patientChatWrap" style="display:none">
+    <div style="padding:10px 16px;background:#fff;border-bottom:1px solid var(--blush);display:flex;align-items:center;gap:10px">
+      <button onclick="closePChat()" style="background:none;border:none;font-size:20px;cursor:pointer;color:var(--p500)">←</button>
+      <div><div style="font-size:14px;font-weight:700">💬 محادثتك مع الطبيب</div><div id="pChatId" style="font-size:11px;color:var(--light)"></div></div>
+    </div>
+    <div class="chat-wrap">
+      <div class="chat-area" id="patChatMsgs"></div>
+      <input type="file" id="patFileInput" accept="image/*,.pdf" style="display:none" onchange="patSendFile()">
+      <div class="chat-input">
+        <button class="attach-btn" onclick="document.getElementById('patFileInput').click()">📎</button>
+        <textarea id="patMsgInput" placeholder="اكتب رسالتك..." rows="1" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();patSendMsg()}"></textarea>
+        <button class="send-btn" onclick="patSendMsg()">➤</button>
+      </div>
+    </div>
+  </div>
+  <div class="bottom-nav">
+    <button class="ni" onclick="showView('landing')"><span class="ni-icon">🏠</span><span class="ni-lbl">الرئيسية</span></button>
+    <button class="ni" onclick="startBooking()"><span class="ni-icon">📋</span><span class="ni-lbl">حجز</span></button>
+    <button class="ni" onclick="showView('tracking')"><span class="ni-icon">🔍</span><span class="ni-lbl">تتبع</span></button>
+    <button class="ni active"><span class="ni-icon">💬</span><span class="ni-lbl">رسائل</span></button>
+  </div>
+</div>
+
+<!-- ══════════════ SERVICES ══════════════ -->
+<div id="services-page" class="view">
+  <div class="page-hdr"><h2>💊 خدماتنا وأسعارنا</h2><p>عيادة ساكورا للطب النفسي</p></div>
+  <div style="padding:18px;display:flex;flex-direction:column;gap:11px" id="servicesDisplay"></div>
+  <div style="padding:0 18px 18px"><button class="btn-p" onclick="startBooking()">احجز الآن 🌸</button></div>
+  <div class="bottom-nav">
+    <button class="ni" onclick="showView('landing')"><span class="ni-icon">🏠</span><span class="ni-lbl">الرئيسية</span></button>
+    <button class="ni active"><span class="ni-icon">💊</span><span class="ni-lbl">الخدمات</span></button>
+    <button class="ni" onclick="startBooking()"><span class="ni-icon">📋</span><span class="ni-lbl">حجز</span></button>
+    <button class="ni" onclick="showView('messages-view')"><span class="ni-icon">💬</span><span class="ni-lbl">رسائل</span></button>
+  </div>
+</div>
+
+<!-- ══════════════ ADMIN LOGIN ══════════════ -->
+<div id="admin-login" class="view">
+  <div class="adm-logo">🔐</div>
+  <div class="adm-title">لوحة الإدارة</div>
+  <div class="adm-sub">عيادة ساكورا النفسية</div>
+  <div class="adm-form">
+    <input type="text" class="adm-input" id="admU" placeholder="اسم المستخدم">
+    <input type="password" class="adm-input" id="admP" placeholder="كلمة المرور" onkeydown="if(event.key==='Enter')adminLogin()">
+    <div class="adm-err" id="admErr">❌ بيانات غير صحيحة</div>
+    <button style="padding:14px;border:none;border-radius:var(--rs);background:linear-gradient(135deg,var(--p400),var(--p600));color:#fff;font-size:15px;font-weight:700;cursor:pointer;font-family:'Tajawal',sans-serif" onclick="adminLogin()">دخول ←</button>
+    <button class="btn-s" onclick="showView('landing')">← رجوع للرئيسية</button>
+  </div>
+</div>
+
+<!-- ══════════════ ADMIN PANEL ══════════════ -->
+<div id="admin-panel" class="view" style="padding-bottom:0">
+  <div class="adm-hdr">
+    <div><h2>🌸 لوحة الإدارة</h2><p id="loggedAsLbl">عيادة ساكورا</p></div>
+    <button class="btn-logout" onclick="adminLogout()">خروج</button>
+  </div>
+  <div class="adm-tabs">
+    <button class="adm-tab active" onclick="switchTab('t-bk',this)">📋 الحجوزات</button>
+    <button class="adm-tab" onclick="switchTab('t-msg',this)">💬 الرسائل</button>
+    <button class="adm-tab" onclick="switchTab('t-svc',this)">💊 الخدمات</button>
+    <button class="adm-tab" onclick="switchTab('t-stats',this)">📊 إحصائيات</button>
+    <button class="adm-tab" onclick="switchTab('t-settings',this)">⚙️ الإعدادات</button>
+  </div>
+  <div class="adm-content">
+
+    <!-- Bookings -->
+    <div class="adm-sec active" id="t-bk"><div id="admBookings"></div></div>
+
+    <!-- Messages -->
+    <div class="adm-sec" id="t-msg">
+      <div class="adm-field"><label>اختر مريض</label>
+        <select id="admChatSel" onchange="loadAdmChat(this.value)">
+          <option value="">— اختر مريض —</option>
+        </select>
+      </div>
+      <div style="background:#fff;border-radius:var(--r);overflow:hidden;box-shadow:var(--shadow)">
+        <div class="chat-area" id="admChatMsgs" style="min-height:220px;max-height:320px"></div>
+        <input type="file" id="admFileInput" accept="image/*,.pdf" style="display:none" onchange="admSendFile()">
+        <div class="chat-input">
+          <button class="attach-btn" onclick="document.getElementById('admFileInput').click()">📎</button>
+          <textarea id="admMsgInput" placeholder="رد على المريض..." rows="1"></textarea>
+          <button class="send-btn" onclick="admSendMsg()">➤</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Services -->
+    <div class="adm-sec" id="t-svc">
+      <div class="add-svc">
+        <h4>➕ إضافة خدمة جديدة</h4>
+        <div class="adm-field"><label>اسم الخدمة</label><input type="text" id="nsN" placeholder="اسم الخدمة"></div>
+        <div class="adm-field"><label>السعر (دينار)</label><input type="text" id="nsP" placeholder="مثال: 100"></div>
+        <div class="adm-field"><label>الوصف</label><textarea id="nsD" rows="2" placeholder="وصف مختصر"></textarea></div>
+        <button class="btn-p" onclick="addService()">➕ إضافة</button>
+      </div>
+      <div id="admSvcList"></div>
+    </div>
+
+    <!-- Stats -->
+    <div class="adm-sec" id="t-stats">
+      <div class="stats-grid">
+        <div class="stat-card"><div class="stat-num" id="stTotal">0</div><div class="stat-lbl">إجمالي الحجوزات</div></div>
+        <div class="stat-card"><div class="stat-num" id="stSvc">0</div><div class="stat-lbl">الخدمات المتاحة</div></div>
+        <div class="stat-card"><div class="stat-num" id="stRat">—</div><div class="stat-lbl">متوسط التقييم</div></div>
+        <div class="stat-card"><div class="stat-num" id="stMsgs">0</div><div class="stat-lbl">الرسائل الواردة</div></div>
+      </div>
+      <div class="stat-card" style="background:#fff;border-radius:var(--r);padding:18px;text-align:center;box-shadow:var(--shadow)">
+        <div class="stat-lbl" style="margin-bottom:6px">الخدمة الأكثر طلباً</div>
+        <div id="stPop" style="font-size:15px;font-weight:700;color:var(--p500)">—</div>
+      </div>
+    </div>
+
+    <!-- Settings -->
+    <div class="adm-sec" id="t-settings">
+      <div class="settings-sec">
+        <h4>📱 رقم واتس الإشعارات</h4>
+        <div class="adm-field"><label>الرقم الحالي</label><input type="tel" id="setWa" placeholder="09XXXXXXXX"></div>
+        <button class="btn-p" onclick="saveSettings()">💾 حفظ</button>
+      </div>
+      <div class="settings-sec">
+        <h4>🔐 تغيير كلمة المرور</h4>
+        <div class="adm-field"><label>كلمة المرور الجديدة</label><input type="password" id="newPassInput" placeholder="كلمة المرور الجديدة"></div>
+        <button class="btn-p" onclick="changeMyPass()">🔒 تغيير</button>
+      </div>
+      <div class="settings-sec">
+        <h4>👥 إدارة الأدمن</h4>
+        <div id="adminUsersList"></div>
+        <button class="btn-p" style="margin-top:10px" onclick="openModal('addAdminModal')">➕ إضافة أدمن جديد</button>
+      </div>
+      <div class="settings-sec">
+        <h4>🗑️ إدارة البيانات</h4>
+        <button class="btn-s" style="border-color:#ffcdd2;color:#c62828;margin-bottom:8px" onclick="clearBookings()">🗑️ مسح كل الحجوزات</button>
+        <button class="btn-s" style="border-color:#ffcdd2;color:#c62828" onclick="clearMessages()">🗑️ مسح كل الرسائل</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════
+// DATA
+// ══════════════════════════════════════
+let services = JSON.parse(localStorage.getItem('sc_svc')||'null') || [
+  {id:1,name:'كشف طبي نفسي أول',price:'60',desc:'تشخيص وخطة علاجية'},
+  {id:2,name:'جلسة علاج نفسي وسلوكي',price:'100',desc:'Talk Therapy'},
+  {id:3,name:'باقة "استقرار"',price:'350',desc:'4 جلسات علاجية'},
+  {id:4,name:'الرأي الطبي الثاني',price:'30',desc:'مراجعة التحاليل والتقارير'},
+  {id:5,name:'إفادة استشارية رقمية',price:'40',desc:'ملخص حالة أو تقرير'},
+  {id:6,name:'استشارة متابعة عاجلة',price:'30',desc:'نصية / صوتية'},
+];
+let bookings = JSON.parse(localStorage.getItem('sc_bk')||'[]');
+let messages = JSON.parse(localStorage.getItem('sc_msg')||'{}');
+let ratings  = JSON.parse(localStorage.getItem('sc_rat')||'[]');
+let settings = JSON.parse(localStorage.getItem('sc_set')||'null') || {
+  wa:'0942651559',
+  admins:[
+    {user:'admin',pass:'sakura2024',role:'أدمن رئيسي'},
+    {user:'Ahmed',pass:'Sakura2000',role:'أدمن'}
+  ]
+};
+
+const sv=k=>localStorage.setItem(k,JSON.stringify(k==='sc_svc'?services:k==='sc_bk'?bookings:k==='sc_msg'?messages:k==='sc_rat'?ratings:settings));
+function saveSvc(){
+  localStorage.setItem('sc_svc',JSON.stringify(services));
+  db.collection('config').doc('services').set({list:services});
+}
+function saveBk(){
+  localStorage.setItem('sc_bk',JSON.stringify(bookings));
+}
+function saveMsg(){
+  localStorage.setItem('sc_msg',JSON.stringify(messages));
+}
+function saveRat(){
+  localStorage.setItem('sc_rat',JSON.stringify(ratings));
+  db.collection('config').doc('ratings').set({list:ratings});
+}
+function saveSet(){
+  localStorage.setItem('sc_set',JSON.stringify(settings));
+  db.collection('config').doc('settings').set(settings);
+}
+function saveBookingDoc(bk){
+  localStorage.setItem('sc_bk',JSON.stringify(bookings));
+  db.collection('bookings').doc(bk.id).set(bk);
+}
+function saveMsgDoc(bookingId){
+  localStorage.setItem('sc_msg',JSON.stringify(messages));
+  db.collection('messages').doc(bookingId).set({bookingId, msgs: messages[bookingId]||[]});
+}
+
+// تحميل البيانات من Firebase عند البدء
+async function loadFromFirebase(){
+  try{
+    // bookings
+    const bkSnap = await db.collection('bookings').get();
+    if(!bkSnap.empty){
+      bookings = bkSnap.docs.map(d=>d.data()).sort((a,b)=>b.id.localeCompare(a.id));
+      localStorage.setItem('sc_bk',JSON.stringify(bookings));
+    }
+    // messages
+    const msgSnap = await db.collection('messages').get();
+    msgSnap.forEach(d=>{ messages[d.data().bookingId]=d.data().msgs||[]; });
+    // services
+    const svcDoc = await db.collection('config').doc('services').get();
+    if(svcDoc.exists && svcDoc.data().list) services=svcDoc.data().list;
+    // settings
+    const setDoc = await db.collection('config').doc('settings').get();
+    if(setDoc.exists) settings={...settings,...setDoc.data()};
+    // ratings
+    const ratDoc = await db.collection('config').doc('ratings').get();
+    if(ratDoc.exists && ratDoc.data().list) ratings=ratDoc.data().list;
+  }catch(e){ console.log('Firebase load error:',e); }
+
+  // Real-time: رسائل جديدة
+  db.collection('messages').onSnapshot(snap=>{
+    snap.docChanges().forEach(ch=>{
+      const d=ch.doc.data();
+      messages[d.bookingId]=d.msgs||[];
+      if(typeof activePChat!=='undefined' && activePChat===d.bookingId) renderPChat();
+      const sel=document.getElementById('admChatSel');
+      if(sel && sel.value===d.bookingId) loadAdmChat(d.bookingId);
+    });
+  });
+
+  // Real-time: حجوزات جديدة
+  db.collection('bookings').onSnapshot(snap=>{
+    snap.docChanges().forEach(ch=>{
+      const d={id:ch.doc.id,...ch.doc.data()};
+      if(ch.type==='removed'){ bookings=bookings.filter(b=>b.id!==d.id); }
+      else{ const i=bookings.findIndex(b=>b.id===d.id); if(i>=0)bookings[i]=d; else bookings.unshift(d); }
+    });
+  });
+
+  updateBadge();
+  renderServicesRadio();
+}
+
+let currentAdmin = null;
+
+// ══════════════════════════════════════
+// PETALS
+// ══════════════════════════════════════
+(()=>{
+  const bg=document.getElementById('petalsBg');
+  for(let i=0;i<16;i++){
+    const p=document.createElement('div');p.className='petal';
+    p.style.cssText=`left:${Math.random()*100}%;width:${10+Math.random()*14}px;height:${14+Math.random()*16}px;animation-duration:${8+Math.random()*10}s;animation-delay:${Math.random()*14}s;background:linear-gradient(135deg,#ffb8d2,#ff85b3);opacity:${.3+Math.random()*.5}`;
+    bg.appendChild(p);
+  }
+})();
+
+// ══════════════════════════════════════
+// NAVIGATION
+// ══════════════════════════════════════
+function goMessages(){
+  showView('messages-view');
+  setTimeout(()=>{
+    document.getElementById('msgTrackInput')?.scrollIntoView({behavior:'smooth',block:'center'});
+    document.getElementById('msgTrackInput')?.focus();
+  },100);
+}
+
+function goTracking(){
+  showView('tracking');
+  setTimeout(()=>{
+    document.getElementById('trackInput')?.scrollIntoView({behavior:'smooth',block:'center'});
+    document.getElementById('trackInput')?.focus();
+  },100);
+}
+
+function goServices(){
+  showView('services-page');
+  setTimeout(()=>{
+    document.getElementById('services-page')?.scrollIntoView({behavior:'smooth',block:'start'});
+  },100);
+}
+
+// ══════════════════════════════════════
+// ضغط مطول على الوردة لفتح الأدمن
+// ══════════════════════════════════════
+let logoTimer=null;
+let logoProgress=null;
+
+function startLogoPress(){
+  const logo=document.getElementById('mainLogo');
+  logo.style.transition='box-shadow 3s linear';
+  logo.style.boxShadow='0 0 0 6px var(--p300), 0 8px 40px rgba(232,51,110,.35)';
+  logoTimer=setTimeout(()=>{
+    logo.style.boxShadow='';
+    logo.style.transition='';
+    showView('admin-login');
+    setTimeout(()=>document.getElementById('admU')?.focus(),300);
+  },3000);
+}
+
+function cancelLogoPress(){
+  clearTimeout(logoTimer);
+  const logo=document.getElementById('mainLogo');
+  logo.style.boxShadow='';
+  logo.style.transition='';
+}
+
+function showView(id){
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo({top:0,behavior:'smooth'});
+  if(id==='services-page')renderServicesPage();
+  if(id==='admin-panel')renderAdminPanel();
+}
+function startBooking(){
+  renderServicesRadio();
+  showView('booking');
+  gp(1);
+  setTimeout(()=>{
+    const form=document.getElementById('bp1');
+    if(form) form.scrollIntoView({behavior:'smooth',block:'start'});
+  },100);
+}
+function goMessages(){
+  const id=document.getElementById('trackIdShow').textContent;
+  document.getElementById('msgTrackInput').value=id;
+  showView('messages-view');
+  openPatientChat();
+}
+
+// ══════════════════════════════════════
+// RADIO
+// ══════════════════════════════════════
+const R={};
+function sel(el,name,val){
+  document.querySelectorAll(`[name="${name}"]`).forEach(x=>x.closest('.radio-opt')?.classList.remove('selected'));
+  el.classList.add('selected');R[name]=val;
+}
+
+// ══════════════════════════════════════
+// BOOKING FORM
+// ══════════════════════════════════════
+const pLbls=['','الخطوة ١ من ٥ — البيانات الأساسية','الخطوة ٢ من ٥ — الاستبيان الطبي','الخطوة ٣ من ٥ — الخدمة والوقت','الخطوة ٤ من ٥ — الدفع','الخطوة ٥ من ٥ — طريقة التواصل'];
+
+function renderServicesRadio(){
+  const active=services.filter(s=>s.active!==false);
+  document.getElementById('servicesRadio').innerHTML=active.map(s=>`
+    <div class="radio-opt" onclick="sel(this,'service',${s.id})">
+      <input type="radio" name="service"><div class="rc"></div>
+      <div><div class="rt">${s.name}</div><div class="rp">${s.desc?s.desc+' — ':''}${s.price} دينار</div></div>
+    </div>`).join('');
+}
+
+function gp(n){
+  if(n===2&&(!gv('f_name')||!gv('f_age')||!R.gender)){toast('الرجاء إكمال البيانات الأساسية');return}
+  if(n===4&&(!R.service||!gv('f_time'))){toast('الرجاء اختيار الخدمة وتحديد الوقت');return}
+  if(n===6&&!R.pay){toast('الرجاء اختيار طريقة الدفع');return}
+  document.querySelectorAll('.fp').forEach(p=>p.classList.remove('active'));
+  document.getElementById('bp'+n).classList.add('active');
+  updateProg(n);
+  setTimeout(()=>{
+    const el=document.getElementById('bp'+n);
+    if(el) el.scrollIntoView({behavior:'smooth',block:'start'});
+  },50);
+}
+
+function updateProg(n){
+  for(let i=1;i<=5;i++){
+    const d=document.getElementById('d'+i);if(!d)continue;
+    d.classList.remove('active','done');
+    if(i<n)d.classList.add('done');else if(i===n)d.classList.add('active');
+    const l=document.getElementById('l'+i);if(l)l.classList.toggle('done',i<n);
+  }
+  document.getElementById('progLbl').textContent=pLbls[n]||'';
+}
+
+function submitBooking(){
+  if(!gv('f_phone')||!R.contact){toast('الرجاء إكمال بيانات التواصل');return}
+  const svc=services.find(s=>s.id==R.service);
+  const id='SC-'+Date.now().toString(36).toUpperCase().slice(-8);
+  const bk={
+    id,date:new Date().toLocaleDateString('ar-LY'),
+    name:gv('f_name'),age:gv('f_age'),gender:R.gender||'—',
+    symptom:R.symptom||'—',meds:gv('f_meds')||'لا',
+    prev_dx:R.prev_dx||'—',prev_treat:R.prev_treat||'—',desc:gv('f_desc'),
+    service:svc?svc.name:'—',price:svc?svc.price:'—',
+    time:gv('f_time'),notes:gv('f_notes'),
+    pay:R.pay||'—',proof:gv('f_proof'),
+    contact:R.contact||'—',phone:gv('f_phone'),
+    status:'new',
+    history:[{s:'new',d:new Date().toLocaleDateString('ar-LY'),note:'تم استلام الطلب'}]
+  };
+  bookings.unshift(bk);saveBookingDoc(bk);
+  if(!messages[id])messages[id]=[];saveMsgDoc(id);
+  document.getElementById('trackIdShow').textContent=id;
+  document.querySelectorAll('.fp').forEach(p=>p.classList.remove('active'));
+  document.getElementById('bpOk').classList.add('active');
+  document.getElementById('progLbl').textContent='✅ تم الإرسال';
+  addNewBookingBadge();
+  setTimeout(()=>{
+    document.getElementById('bpOk').scrollIntoView({behavior:'smooth',block:'start'});
+  },50);
+}
+
+// ══════════════════════════════════════
+// نظام الإشعارات — رقم أحمر على لوحة الأدمن
+// ══════════════════════════════════════
+function addNewBookingBadge(){
+  let count = parseInt(localStorage.getItem('sc_new_bk')||'0') + 1;
+  localStorage.setItem('sc_new_bk', count);
+  updateBadge();
+}
+function clearBadge(){
+  localStorage.setItem('sc_new_bk','0');
+  updateBadge();
+}
+function updateBadge(){
+  const count = parseInt(localStorage.getItem('sc_new_bk')||'0');
+  document.querySelectorAll('.admin-badge').forEach(el=>{
+    el.textContent = count > 0 ? count : '';
+    el.style.display = count > 0 ? 'flex' : 'none';
+  });
+}
+
+function gv(id){return document.getElementById(id)?.value?.trim()||''}
+
+function resetBooking(){
+  Object.keys(R).forEach(k=>delete R[k]);
+  ['f_name','f_age','f_meds','f_desc','f_time','f_notes','f_proof','f_phone'].forEach(id=>{const e=document.getElementById(id);if(e)e.value=''});
+  document.querySelectorAll('.radio-opt').forEach(o=>o.classList.remove('selected'));
+  document.querySelectorAll('.fp').forEach(p=>p.classList.remove('active'));
+  document.getElementById('bp1').classList.add('active');
+  updateProg(1);renderServicesRadio();
+}
+
+// ══════════════════════════════════════
+// TRACKING
+// ══════════════════════════════════════
+const stMap={new:'🆕 جديد',pending:'⏳ قيد المراجعة',confirmed:'✅ تم التأكيد',scheduled:'📅 تم تحديد الموعد',done:'✔️ مكتمل'};
+const bdMap={new:'b-new',pending:'b-pending',confirmed:'b-confirmed',scheduled:'b-scheduled',done:'b-done'};
+
+function searchBooking(){
+  const id=document.getElementById('trackInput').value.trim().toUpperCase();
+  const bk=bookings.find(b=>b.id===id);
+  const c=document.getElementById('trackResult');
+  if(!bk){c.innerHTML='<div class="empty"><div class="ei">🔍</div><p>لم يتم العثور على هذا الرقم</p></div>';return}
+  const hist=(bk.history||[]).map(h=>`<div class="timeline-item"><div class="t-dot done">✓</div><div><div class="t-title">${stMap[h.s]||h.s}</div>${h.note?`<div class="t-sub">${h.note}</div>`:''}<div class="t-sub">${h.d}</div></div></div>`).join('');
+  c.innerHTML=`<div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px">
+      <div><div style="font-size:16px;font-weight:700">${bk.name}</div><div style="font-size:13px;color:var(--p500);font-weight:600">${bk.service} — ${bk.price} د.ل</div></div>
+      <span class="badge ${bdMap[bk.status]||'b-new'}">${stMap[bk.status]||bk.status}</span>
+    </div>
+    <div style="margin-bottom:12px">${hist}</div>
+    <button class="btn-p" onclick="document.getElementById('msgTrackInput').value='${bk.id}';showView('messages-view');openPatientChat()">💬 مراسلة الطبيب</button>
+  </div>`;
+}
+
+// ══════════════════════════════════════
+// MESSAGES — PATIENT
+// ══════════════════════════════════════
+let activePChat=null;
+
+function openPatientChat(){
+  const id=document.getElementById('msgTrackInput').value.trim().toUpperCase();
+  if(!id){toast('الرجاء إدخال رقم التتبع');return}
+  const bk=bookings.find(b=>b.id===id);
+  if(!bk){toast('رقم التتبع غير صحيح');return}
+  activePChat=id;
+  if(!messages[id])messages[id]=[];
+  document.getElementById('msgEntry').style.display='none';
+  document.getElementById('patientChatWrap').style.display='block';
+  document.getElementById('pChatId').textContent='رقم طلبك: '+id;
+  renderPChat();
+  setTimeout(()=>{
+    document.getElementById('patientChatWrap').scrollIntoView({behavior:'smooth',block:'start'});
+  },100);
+}
+
+function closePChat(){
+  activePChat=null;
+  document.getElementById('msgEntry').style.display='block';
+  document.getElementById('patientChatWrap').style.display='none';
+}
+
+function renderPChat(){
+  const c=document.getElementById('patChatMsgs');
+  const msgs=messages[activePChat]||[];
+  if(!msgs.length){c.innerHTML='<div class="empty" style="padding:30px"><div class="ei">💬</div><p>لا توجد رسائل بعد.<br>ابدأ المحادثة مع الطبيب!</p></div>';return}
+  c.innerHTML=msgs.map(m=>{
+    const isDoc=m.from==='doctor';
+    return `<div class="bubble ${isDoc?'doctor':'patient'}">${m.text||''}${m.img?`<img class="bimg" src="${m.img}">`:''}<span class="btime">${isDoc?'🌸 الطبيب':'أنت'} · ${m.time}</span></div>`;
+  }).join('');
+  c.scrollTop=c.scrollHeight;
+}
+
+function patSendMsg(){
+  const inp=document.getElementById('patMsgInput');
+  const txt=inp.value.trim();if(!txt||!activePChat)return;
+  messages[activePChat].push({from:'patient',text:txt,time:now()});
+  saveMsgDoc(activePChat);inp.value='';renderPChat();
+}
+
+function patSendFile(){
+  const f=document.getElementById('patFileInput').files[0];if(!f||!activePChat)return;
+  readFile(f,img=>{messages[activePChat].push({from:'patient',text:'📎 ملف/صورة',img,time:now()});saveMsgDoc(activePChat);renderPChat()});
+}
+
+// ══════════════════════════════════════
+// SERVICES PAGE
+// ══════════════════════════════════════
+function renderServicesPage(){
+  document.getElementById('servicesDisplay').innerHTML=services.map(s=>`
+    <div class="svc-card"><div><div class="svc-name">${s.name}</div>${s.desc?`<div class="svc-desc">${s.desc}</div>`:''}</div><div class="svc-price">${s.price} د.ل</div></div>`).join('');
+}
+
+// ══════════════════════════════════════
+// ADMIN
+// ══════════════════════════════════════
+function adminLogin(){
+  const u=document.getElementById('admU').value.trim();
+  const p=document.getElementById('admP').value;
+  const adm=settings.admins.find(a=>a.user===u&&a.pass===p);
+  if(adm){
+    currentAdmin=adm;
+    document.getElementById('admErr').style.display='none';
+    document.getElementById('loggedAsLbl').textContent='مرحباً '+adm.user+' · '+adm.role;
+    clearBadge();
+    showView('admin-panel');
+  } else {
+    document.getElementById('admErr').style.display='block';
+  }
+}
+function adminLogout(){currentAdmin=null;showView('landing')}
+
+function switchTab(id,btn){
+  document.querySelectorAll('.adm-sec').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.adm-tab').forEach(b=>b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');btn.classList.add('active');
+}
+
+function renderAdminPanel(){
+  renderAdmBookings();renderAdmSvc();renderAdmStats();renderAdmChatSel();renderAdminUsers();
+  document.getElementById('setWa').value=settings.wa||'0942651559';
+}
+
+function renderAdmBookings(){
+  const c=document.getElementById('admBookings');
+  if(!bookings.length){c.innerHTML='<div class="empty"><div class="ei">📋</div><p>لا توجد حجوزات بعد</p></div>';return}
+  c.innerHTML=bookings.map(b=>`
+    <div class="bk-card">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start">
+        <div>
+          <div class="bk-name">👤 ${b.name} · ${b.age||'—'} سنة (${b.gender||'—'})</div>
+          <div class="bk-svc">💊 ${b.service} — ${b.price} د.ل</div>
+          <div class="bk-date">🗓️ ${b.time?b.time.replace('T',' '):'—'} · ${b.date}</div>
+          <div class="bk-meta">🩺 ${b.symptom||'—'} | 💊 ${b.meds||'—'}</div>
+          <div class="bk-meta">🔬 تشخيص سابق: ${b.prev_dx||'—'} | علاج سابق: ${b.prev_treat||'—'}</div>
+          ${b.desc?`<div class="bk-meta">📝 ${b.desc}</div>`:''}
+          <div class="bk-meta">📞 ${b.contact}: ${b.phone}</div>
+          <div class="bk-meta">💳 ${b.pay}${b.proof?' · '+b.proof:''}</div>
+        </div>
+        <span class="badge ${bdMap[b.status]||'b-new'}">${stMap[b.status]||b.status}</span>
+      </div>
+      <div class="bk-acts">
+        <button class="bk-btn bb-msg" onclick="openAdmChatFor('${b.id}')">💬 مراسلة</button>
+        <button class="bk-btn bb-st" onclick="openStatusModal('${b.id}')">📊 الحالة</button>
+        <button class="bk-btn bb-meet" onclick="sendMeet('${b.phone}')">📹 Meet</button>
+        <button class="bk-btn bb-del" onclick="delBooking('${b.id}')">🗑️</button>
+      </div>
+      <div style="font-size:11px;color:var(--light);margin-top:5px">🔑 ${b.id}</div>
+    </div>`).join('');
+}
+
+function renderAdmChatSel(){
+  const sel=document.getElementById('admChatSel');
+  sel.innerHTML='<option value="">— اختر مريض —</option>'+bookings.map(b=>`<option value="${b.id}">${b.name} (${b.id})</option>`).join('');
+}
+
+function openAdmChatFor(id){
+  switchTab('t-msg',document.querySelectorAll('.adm-tab')[1]);
+  document.getElementById('admChatSel').value=id;loadAdmChat(id);
+}
+
+function loadAdmChat(id){
+  if(!id)return;if(!messages[id])messages[id]=[];
+  const c=document.getElementById('admChatMsgs');
+  const msgs=messages[id];
+  if(!msgs.length){c.innerHTML='<div class="empty" style="padding:20px"><div class="ei">💬</div><p>لا توجد رسائل</p></div>';return}
+  c.innerHTML=msgs.map((m,i)=>`
+    <div class="bubble ${m.from==='doctor'?'doctor':'patient'}" style="position:relative">
+      ${m.text||''}${m.img?`<img class="bimg" src="${m.img}">`:''} 
+      <span class="btime">${m.from==='doctor'?'🌸 الطبيب':'المريض'} · ${m.time}</span>
+      <button onclick="delMsg('${id}',${i})" style="position:absolute;top:4px;left:4px;background:none;border:none;cursor:pointer;font-size:13px;opacity:0.5">🗑️</button>
+    </div>`).join('');
+  c.scrollTop=c.scrollHeight;
+}
+
+function delMsg(bookingId, idx){
+  if(!confirm('حذف هذه الرسالة؟'))return;
+  messages[bookingId].splice(idx,1);
+  saveMsgDoc(bookingId);
+  loadAdmChat(bookingId);
+  toast('🗑️ تم حذف الرسالة');
+}
+
+function admSendMsg(){
+  const id=document.getElementById('admChatSel').value;
+  const txt=document.getElementById('admMsgInput').value.trim();
+  if(!txt||!id){toast('اختر مريضاً واكتب رسالة');return}
+  if(!messages[id])messages[id]=[];
+  messages[id].push({from:'doctor',text:txt,time:now()});
+  saveMsgDoc(id);document.getElementById('admMsgInput').value='';loadAdmChat(id);
+  if(activePChat===id)renderPChat();
+}
+
+function admSendFile(){
+  const id=document.getElementById('admChatSel').value;if(!id)return;
+  const f=document.getElementById('admFileInput').files[0];if(!f)return;
+  readFile(f,img=>{
+    if(!messages[id])messages[id]=[];
+    messages[id].push({from:'doctor',text:'📎 ملف/صورة',img,time:now()});
+    saveMsgDoc(id);loadAdmChat(id);if(activePChat===id)renderPChat();
+  });
+}
+
+let editStatusId=null;
+function openStatusModal(id){
+  editStatusId=id;
+  const bk=bookings.find(b=>b.id===id);
+  if(bk){document.getElementById('newStatus').value=bk.status||'new';document.getElementById('statusNote').value=''}
+  openModal('statusModal');
+}
+function saveStatus(){
+  const bk=bookings.find(b=>b.id===editStatusId);if(!bk)return;
+  const ns=document.getElementById('newStatus').value;
+  const note=document.getElementById('statusNote').value.trim();
+  bk.status=ns;
+  if(!bk.history)bk.history=[];
+  bk.history.push({s:ns,d:new Date().toLocaleDateString('ar-LY'),note});
+  saveBookingDoc(bk);closeModal('statusModal');renderAdmBookings();toast('✅ تم تحديث الحالة');
+  if(confirm('إشعار المريض على واتس؟')){
+    const msg=`🌸 *Sakura Clinic*\n\nمرحباً ${bk.name}،\nتم تحديث حالة طلبك:\n${stMap[ns]}\n${note?'📝 '+note:''}\n🔑 ${bk.id}`;
+    window.open(`https://wa.me/218${bk.phone.replace(/^0/,'')}?text=${encodeURIComponent(msg)}`,'_blank');
+  }
+}
+
+function sendMeet(phone){
+  const link=prompt('أدخل رابط Google Meet:','https://meet.google.com/');
+  if(!link)return;
+  const msg=`🌸 *Sakura Clinic*\n\nرابط جلستك:\n${link}`;
+  window.open(`https://wa.me/218${phone.replace(/^0/,'')}?text=${encodeURIComponent(msg)}`,'_blank');
+}
+
+function delBooking(id){
+  if(!confirm('هل تريد حذف هذا الحجز؟'))return;
+  bookings=bookings.filter(b=>b.id!==id);
+  localStorage.setItem('sc_bk',JSON.stringify(bookings));
+  db.collection('bookings').doc(id).delete();
+  renderAdmBookings();renderAdmChatSel();toast('🗑️ تم الحذف');
+}
+
+function renderAdmSvc(){
+  document.getElementById('admSvcList').innerHTML=services.map(s=>`
+    <div class="svc-adm" style="opacity:${s.active===false?'0.45':'1'}">
+      <div>
+        <div class="sa-name">${s.name} ${s.active===false?'<span style="font-size:11px;color:#e65100;background:#fff3e0;padding:2px 8px;border-radius:20px">متوقفة</span>':''}</div>
+        <div class="sa-price">${s.price} دينار${s.desc?' — '+s.desc:''}</div>
+      </div>
+      <div class="sa-acts">
+        <button class="btn-edit" onclick="toggleSvc(${s.id})">${s.active===false?'✅':'⏸️'}</button>
+        <button class="btn-edit" onclick="openEdit(${s.id})">✏️</button>
+        <button class="btn-del" onclick="delSvc(${s.id})">🗑️</button>
+      </div>
+    </div>`).join('');
+}
+
+function toggleSvc(id){
+  const s=services.find(x=>x.id===id);if(!s)return;
+  s.active=s.active===false?true:false;
+  saveSvc();renderAdmSvc();renderServicesRadio();
+  toast(s.active===false?'⏸️ تم إيقاف الخدمة':'✅ تم تفعيل الخدمة');
+}
+
+function addService(){
+  const n=document.getElementById('nsN').value.trim();
+  const p=document.getElementById('nsP').value.trim();
+  const d=document.getElementById('nsD').value.trim();
+  if(!n||!p){toast('الرجاء إدخال الاسم والسعر');return}
+  services.push({id:Date.now(),name:n,price:p,desc:d});
+  saveSvc();['nsN','nsP','nsD'].forEach(id=>document.getElementById(id).value='');
+  renderAdmSvc();renderServicesRadio();toast('✅ تمت الإضافة');
+}
+
+let editId=null;
+function openEdit(id){
+  const s=services.find(x=>x.id===id);if(!s)return;
+  editId=id;
+  document.getElementById('eN').value=s.name;
+  document.getElementById('eP').value=s.price;
+  document.getElementById('eD').value=s.desc||'';
+  openModal('editModal');
+}
+function saveEdit(){
+  const s=services.find(x=>x.id===editId);if(!s)return;
+  s.name=document.getElementById('eN').value.trim()||s.name;
+  s.price=document.getElementById('eP').value.trim()||s.price;
+  s.desc=document.getElementById('eD').value.trim();
+  saveSvc();closeModal('editModal');renderAdmSvc();renderServicesRadio();toast('✅ تم الحفظ');
+}
+function delSvc(id){
+  if(!confirm('حذف هذه الخدمة؟'))return;
+  services=services.filter(s=>s.id!==id);saveSvc();renderAdmSvc();renderServicesRadio();toast('🗑️ تم الحذف');
+}
+
+function renderAdmStats(){
+  document.getElementById('stTotal').textContent=bookings.length;
+  document.getElementById('stSvc').textContent=services.length;
+  const totalM=Object.values(messages).reduce((a,m)=>a+(m.filter(x=>x.from==='patient').length),0);
+  document.getElementById('stMsgs').textContent=totalM;
+  if(ratings.length){
+    const avg=(ratings.reduce((a,r)=>a+r.stars,0)/ratings.length).toFixed(1);
+    document.getElementById('stRat').textContent=avg+'⭐';
+  }
+  if(bookings.length){
+    const freq={};bookings.forEach(b=>{freq[b.service]=(freq[b.service]||0)+1});
+    const top=Object.entries(freq).sort((a,b)=>b[1]-a[1])[0];
+    document.getElementById('stPop').textContent=top?top[0]:'—';
+  }
+}
+
+// Admin Users
+function renderAdminUsers(){
+  const c=document.getElementById('adminUsersList');
+  c.innerHTML=settings.admins.map((a,i)=>`
+    <div class="admin-user-card">
+      <div class="au-info"><div class="au-name">👤 ${a.user}</div><div class="au-role">${a.role}</div></div>
+      ${i>0?`<button class="bk-btn bb-del" onclick="removeAdmin(${i})">🗑️</button>`:'<span style="font-size:11px;color:var(--light)">رئيسي</span>'}
+    </div>`).join('');
+}
+
+function addAdminUser(){
+  const u=document.getElementById('naU').value.trim();
+  const p=document.getElementById('naP').value.trim();
+  if(!u||!p){toast('الرجاء إدخال اسم المستخدم وكلمة المرور');return}
+  if(settings.admins.find(a=>a.user===u)){toast('اسم المستخدم موجود مسبقاً');return}
+  settings.admins.push({user:u,pass:p,role:'أدمن'});
+  saveSet();closeModal('addAdminModal');renderAdminUsers();
+  document.getElementById('naU').value='';document.getElementById('naP').value='';
+  toast('✅ تمت إضافة الأدمن');
+}
+
+function removeAdmin(i){
+  if(!confirm('هل تريد حذف هذا الأدمن؟'))return;
+  settings.admins.splice(i,1);saveSet();renderAdminUsers();toast('🗑️ تم الحذف');
+}
+
+function saveSettings(){
+  settings.wa=document.getElementById('setWa').value.trim()||settings.wa;
+  saveSet();toast('✅ تم حفظ الإعدادات');
+}
+
+function changeMyPass(){
+  const np=document.getElementById('newPassInput').value.trim();
+  if(!np){toast('الرجاء إدخال كلمة المرور الجديدة');return}
+  if(!currentAdmin){toast('لم يتم تحديد الأدمن');return}
+  const adm=settings.admins.find(a=>a.user===currentAdmin.user);
+  if(adm){adm.pass=np;saveSet();document.getElementById('newPassInput').value='';toast('🔒 تم تغيير كلمة المرور');}
+}
+
+function clearBookings(){
+  if(!confirm('هل أنت متأكد من مسح كل الحجوزات؟'))return;
+  bookings.forEach(b=>db.collection('bookings').doc(b.id).delete());
+  bookings=[];localStorage.setItem('sc_bk',JSON.stringify(bookings));
+  renderAdmBookings();toast('🗑️ تم مسح الحجوزات');
+}
+function clearMessages(){
+  if(!confirm('هل أنت متأكد من مسح كل الرسائل؟'))return;
+  Object.keys(messages).forEach(id=>db.collection('messages').doc(id).delete());
+  messages={};localStorage.setItem('sc_msg',JSON.stringify(messages));
+  toast('🗑️ تم مسح الرسائل');
+}
+
+// ══════════════════════════════════════
+// RATING
+// ══════════════════════════════════════
+let selStars=0;
+function openRating(){openModal('ratingModal')}
+function rateStar(n){
+  selStars=n;
+  document.querySelectorAll('.star').forEach((s,i)=>s.classList.toggle('active',i<n));
+}
+function submitRating(){
+  if(!selStars){toast('الرجاء اختيار عدد النجوم');return}
+  ratings.push({stars:selStars,comment:document.getElementById('ratComment').value.trim(),date:new Date().toLocaleDateString('ar-LY')});
+  saveRat();closeModal('ratingModal');toast('⭐ شكراً على تقييمك!');
+}
+
+// ══════════════════════════════════════
+// UTILS
+// ══════════════════════════════════════
+function openModal(id){document.getElementById(id).classList.add('open')}
+function closeModal(id){document.getElementById(id).classList.remove('open')}
+function now(){return new Date().toLocaleTimeString('ar',{hour:'2-digit',minute:'2-digit'})}
+function readFile(f,cb){const r=new FileReader();r.onload=e=>cb(e.target.result);r.readAsDataURL(f)}
+
+function cp(text,e){
+  if(e){e.stopPropagation();e.preventDefault()}
+  navigator.clipboard.writeText(text).catch(()=>{
+    const el=document.createElement('textarea');el.value=text;document.body.appendChild(el);el.select();document.execCommand('copy');document.body.removeChild(el);
+  });
+  toast('✅ تم النسخ');
+}
+
+let toastT;
+function toast(msg){
+  const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');
+  clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('show'),2600);
+}
+
+// Init
+loadFromFirebase();
+</script>
+</body>
+</html>
