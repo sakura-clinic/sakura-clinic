@@ -293,7 +293,7 @@ label{font-size:14px;font-weight:600;color:var(--dark);display:block;margin-bott
 
 <!-- ══════════════ LANDING ══════════════ -->
 <div id="landing" class="view active">
-  <div class="logo-wrap">🌸</div>
+  <div class="logo-wrap" id="mainLogo" onmousedown="startLogoPress()" onmouseup="cancelLogoPress()" onmouseleave="cancelLogoPress()" ontouchstart="startLogoPress()" ontouchend="cancelLogoPress()">🌸</div>
   <div class="clinic-name">Sakura Clinic</div>
   <div class="clinic-en">عيادة ساكورا للطب النفسي</div>
   <div class="doctor-tag">د. أحمد عياد · طب نفسي كبار وصغار وعلاج اضطرابات نفسية</div>
@@ -310,7 +310,7 @@ label{font-size:14px;font-weight:600;color:var(--dark);display:block;margin-bott
     <button class="land-btn" onclick="showView('services-page')">
       <span class="l-icon">💊</span><span class="l-title">الخدمات</span><span class="l-sub">الأسعار</span>
     </button>
-    <button class="land-btn" onclick="showView('admin-login')" style="position:relative">
+    <button class="land-btn" onclick="showView('admin-login')" style="position:relative;display:none" id="adminBtn">
       <span class="admin-badge" id="landingBadge"></span>>
       <span class="l-icon">🔐</span><span class="l-title">لوحة الأدمن</span><span class="l-sub">للطبيب فقط</span>
     </button>
@@ -785,6 +785,31 @@ let currentAdmin = null;
 // ══════════════════════════════════════
 // NAVIGATION
 // ══════════════════════════════════════
+// ══════════════════════════════════════
+// ضغط مطول على الوردة لفتح الأدمن
+// ══════════════════════════════════════
+let logoTimer=null;
+let logoProgress=null;
+
+function startLogoPress(){
+  const logo=document.getElementById('mainLogo');
+  logo.style.transition='box-shadow 3s linear';
+  logo.style.boxShadow='0 0 0 6px var(--p300), 0 8px 40px rgba(232,51,110,.35)';
+  logoTimer=setTimeout(()=>{
+    logo.style.boxShadow='';
+    logo.style.transition='';
+    showView('admin-login');
+    setTimeout(()=>document.getElementById('admU')?.focus(),300);
+  },3000);
+}
+
+function cancelLogoPress(){
+  clearTimeout(logoTimer);
+  const logo=document.getElementById('mainLogo');
+  logo.style.boxShadow='';
+  logo.style.transition='';
+}
+
 function showView(id){
   document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
   document.getElementById(id).classList.add('active');
@@ -837,7 +862,11 @@ function gp(n){
   if(n===6&&!R.pay){toast('الرجاء اختيار طريقة الدفع');return}
   document.querySelectorAll('.fp').forEach(p=>p.classList.remove('active'));
   document.getElementById('bp'+n).classList.add('active');
-  updateProg(n);window.scrollTo(0,0);
+  updateProg(n);
+  setTimeout(()=>{
+    const el=document.getElementById('bp'+n);
+    if(el) el.scrollIntoView({behavior:'smooth',block:'start'});
+  },50);
 }
 
 function updateProg(n){
